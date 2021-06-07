@@ -1,0 +1,5 @@
+rootProject.name = "YpFramework"
+include ':app'
+include ':framework'
+include ':service-annotation'
+include ':service-process'

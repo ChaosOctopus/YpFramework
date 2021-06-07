@@ -11,13 +11,16 @@ android {
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
             annotationProcessorOptions{
-                arguments = [moduleName:"build",moduleTmpPath:"assets"]
+                String path = project.getBuildDir().path + File.separator + "tmp" +
+                        File.separator + "tuyamodule"
+                arguments = [moduleName:"build",moduleTmpPath:path]
             }
         }
+
+
     }
 
     buildTypes {
@@ -29,6 +32,15 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    sourceSets{
+
+        main{
+            String pathAssets = project.getBuildDir().path + File.separator + "tmp" +
+                    File.separator + "tuyamodule"
+            assets.srcDirs = ['src/assets', 'src/assets/',pathAssets]
+        }
     }
 }
 

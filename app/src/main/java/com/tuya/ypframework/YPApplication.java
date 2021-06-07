@@ -12,6 +12,6 @@ public class YPApplication extends Application {
     public void onCreate() {
         super.onCreate();
         // maybe need a plugin to support it
-//        SmartInitializer.init(this);
+        SmartInitializer.init(this);
     }
 }

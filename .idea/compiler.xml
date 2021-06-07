@@ -25,6 +25,7 @@
     <bytecodeTargetLevel target="1.7">
       <module name="YpFramework.app" target="1.8" />
       <module name="YpFramework.framework" target="1.8" />
+      <module name="YpFramework.service-config" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

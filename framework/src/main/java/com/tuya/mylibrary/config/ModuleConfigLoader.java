@@ -19,7 +19,7 @@ import java.util.Map;
 public class ModuleConfigLoader {
 
     private static final String TAG = ModuleConfigLoader.class.getSimpleName();
-    private static final String APP_MODULE_FILE = "module_app.json";
+    private static final String APP_MODULE_FILE = "build_app_module.json";
     private static volatile ModuleConfigLoader sModuleConfigLoader;
     private ModuleConfigModel mSchemeModel;
 

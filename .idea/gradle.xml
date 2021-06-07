@@ -13,6 +13,7 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/framework" />
             <option value="$PROJECT_DIR$/service-annotation" />
+            <option value="$PROJECT_DIR$/service-config" />
             <option value="$PROJECT_DIR$/service-process" />
           </set>
         </option>

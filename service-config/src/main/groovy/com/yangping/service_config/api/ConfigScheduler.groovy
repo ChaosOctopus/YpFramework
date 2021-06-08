@@ -1,7 +1,10 @@
 package com.yangping.service_config.api
 
 import com.yangping.service_config.ConfigLogger
-import org.gradle.api.Project;
+import com.yangping.service_config.utils.FeatureUtils
+import org.gradle.api.Project
+import org.gradle.api.Task
+import org.gradle.api.tasks.TaskState;
 
 /**
  * @author yangping
@@ -80,7 +83,23 @@ class ConfigScheduler {
         }
 
         if (isApp){
+            Map<Task,ActionRegister> registers = new HashMap<>()
+            Map.Entry<Task, ActionRegister> findRegister
+            mProject.gradle.getTaskGraph().whenReady { graph ->
+                findRegister = registers.find {
+                    graph.hasTask(it.key)
+                }
+            }
+
+            mProject.gradle.getTaskGraph().afterTask { Task markedTask, TaskState state ->
+                if ((!FeatureUtils.useIgnoreAssets(mProject)) && findRegister && markedTask.getDependsOn().contains(findRegister.key)){
+                    findRegister.value.doAction(mProject)
+                }
+            }
+
 
         }
+
+
     }
 }

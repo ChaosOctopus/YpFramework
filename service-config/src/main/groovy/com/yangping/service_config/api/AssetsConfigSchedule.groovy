@@ -1,6 +1,9 @@
 package com.yangping.service_config.api
 
+import com.yangping.service_config.CompactGradle
+import com.yangping.service_config.utils.FeatureUtils
 import org.gradle.api.Project
+import org.gradle.api.Task
 
 /**
  * 抽象出了apt生成的配置文件合并到assets的过程
@@ -53,6 +56,43 @@ abstract class AssetsConfigSchedule {
     }
 
     /**
+     *  返回临时存储文件的目录
+     *  name 建议是 variant.name
+     * @param name
+     * @return
+     */
+    abstract String generateSwapPath(String name)
+
+    /**
+     * 在 Merge doFirst action的时候用于得到指定结尾的文件
+     * @return
+     */
+    abstract String moduleFileSuffix()
+
+    void configAfterPackageOrBundleTask(def variant, ActionRegister register) {
+        if (FeatureUtils.useIgnoreAssets(project)) return
+        def targetFile = CompactGradle.getMergeAssetsTaskOutputDir(CompactGradle.providerGetVoid(variant, "getMergeAssets"))
+        String swap_path = generateSwapPath(variant.name)
+        register.register {
+            File swap_file = new File(swap_path)
+            if (swap_file.exists()) {
+                project.logger.debug(" ======== begin to return to " + targetFile)
+                project.copy {
+                    from swap_file
+                    into targetFile
+                }
+            }
+        }
+        register.register {
+            File swap_file = new File(swap_path)
+            if (swap_file.exists())
+                project.delete {
+                    delete swap_file
+                }
+        }
+    }
+
+    /**
      * 遍历 applicationVariants 时的回调 for app
      * @param variant
      */
@@ -63,7 +103,31 @@ abstract class AssetsConfigSchedule {
      */
     void scheduleLibraryVariants(def variant) {}
 
+    void doFirstActionAtMergeAssets(def variant, Task task) {
+        if (FeatureUtils.useIgnoreAssets(project)) {
+            //input 里的文件不会被过滤掉，而在lastAciton时的output里，这些文件已经被过滤了，所以不能在最后的action里进行结合操作。
+            List<File> collected = new LinkedList<>()
+            task.getInputs().files.each { File assertDir ->
+                File[] results = assertDir.listFiles(new FileFilter() {
+                    @Override
+                    boolean accept(File file) {
+                        return file.name.endsWith(moduleFileSuffix())
+                    }
+                })
+                if (results?.length > 0)
+                    collected.addAll(results)
+            }
+            collectedFiles = collected.toArray()
+        }
+    }
 
+    void doLastActionAtMergeAssets(def variant, Task task) {}
 
+    void doLastActionAtCompilerJava(def variant, Task task) {}
 
+    void configAfterMergeAssetsTask(def variant, Task task) {}
+
+    protected File getMergeAssetsFile(def variant) {
+        return getMergeAssetsTaskOutputDir(providerGetVoid(variant, "getMergeAssets"))
+    }
 }
